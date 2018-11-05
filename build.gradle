@@ -89,7 +89,7 @@ convertSwagger2markup {
 
 
 asciidoctor {
-//	dependsOn convertSwagger2markup
+	dependsOn convertSwagger2markup
 	inputs.dir snippetsOutputDir
 	sourceDir asciiDocInputDir
 	backends = ['html5']
@@ -102,6 +102,8 @@ asciidoctor {
 	]
 }
 
+
+
 bootJar {
 	dependsOn asciidoctor
 	from("${asciidoctor.outputDir}/html5") {
@@ -109,18 +111,25 @@ bootJar {
 	}
 }
 
+task stage(type: Copy, dependsOn: [build, bootJar]) {
+	from jar.archivePath
+	into project.rootDir
+	rename {
+		'app.jar'
+	}
+}
+
+stage.mustRunAfter(clean)
+
+clean << {
+	project.file('app.jar').delete()
+}
+
 task wrapper(type: Wrapper) {
 	gradleVersion = '4.8.1'
 }
 
-bootJar.mustRunAfter(clean)
-
-clean << {
-	project.file("${buildDir}/libs/heroku-gradle-spring-boot.jar").delete()
-}
-
-
-task buildDocker(type: Docker, dependsOn: [clean, bootJar]) {
+task buildDocker(type: Docker, dependsOn: [stage]) {
   push = true
   applicationName = jar.baseName
   dockerfile = file('src/main/docker/Dockerfile')
