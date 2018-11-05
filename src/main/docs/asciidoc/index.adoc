@@ -1,0 +1,10 @@
+= Getting Started With Spring REST Docs
+
+This is an example output for a service running at http://localhost:8080:
+
+include::{generated}/overview.adoc[]
+include::{generated}/paths.adoc[]
+include::{generated}/security.adoc[]
+include::{generated}/definitions.adoc[]
+
+As you can see the format is very simple, and in fact you always get the same message.
