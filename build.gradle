@@ -89,7 +89,7 @@ convertSwagger2markup {
 
 
 asciidoctor {
-	dependsOn convertSwagger2markup
+//	dependsOn convertSwagger2markup
 	inputs.dir snippetsOutputDir
 	sourceDir asciiDocInputDir
 	backends = ['html5']
