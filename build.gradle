@@ -29,8 +29,6 @@ jar {
 	baseName = 'heroku-gradle-spring-boot'
 }
 
-// docker { baseImage 'centos'}
-
 sourceCompatibility = 1.8
 targetCompatibility = sourceCompatibility
 
@@ -111,11 +109,18 @@ bootJar {
 	}
 }
 
-task stage {
-	dependsOn bootJar
+task wrapper(type: Wrapper) {
+	gradleVersion = '4.8.1'
 }
 
-task buildDocker(type: Docker, dependsOn: stage) {
+bootJar.mustRunAfter(clean)
+
+clean << {
+	project.file("${buildDir}/libs/heroku-gradle-spring-boot.jar").delete()
+}
+
+
+task buildDocker(type: Docker, dependsOn: [clean, bootJar]) {
   push = true
   applicationName = jar.baseName
   dockerfile = file('src/main/docker/Dockerfile')
