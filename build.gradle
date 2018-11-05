@@ -111,13 +111,11 @@ bootJar {
 	}
 }
 
-task wrapper(type: Wrapper) { gradleVersion = '4.8.1' }
-
 task stage {
-	dependsOn build
+	dependsOn bootJar
 }
 
-task buildDocker(type: Docker, dependsOn: [build,bootJar]) {
+task buildDocker(type: Docker, dependsOn: stage) {
   push = true
   applicationName = jar.baseName
   dockerfile = file('src/main/docker/Dockerfile')
