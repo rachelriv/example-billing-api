@@ -6,4 +6,4 @@
 /*.ipr
 /*.iws
 /*.log
-app.jar
+/target/

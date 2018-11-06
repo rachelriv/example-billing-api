@@ -22,11 +22,12 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'org.asciidoctor.convert'
 apply plugin: 'io.github.swagger2markup'
 apply plugin: 'docker'
+apply plugin: 'war'
 
 group = 'com.example'
 
 jar {
-	baseName = 'heroku-gradle-spring-boot'
+	baseName = 'app'
 }
 
 sourceCompatibility = 1.8
@@ -102,27 +103,19 @@ asciidoctor {
 	]
 }
 
-
-
-bootJar {
-	dependsOn asciidoctor
-	from("${asciidoctor.outputDir}/html5") {
-		into 'static/docs'
-	}
-}
-
-task stage(type: Copy, dependsOn: [build, bootJar]) {
-	from jar.archivePath
+task stage(type: Copy, dependsOn: [build, war]) {
+	from war.archivePath
 	into project.rootDir
 	rename {
-		'app.jar'
+		'target/app.war'
 	}
 }
 
+war.dependsOn(asciidoctor)
 stage.mustRunAfter(clean)
 
 clean << {
-	project.file('app.jar').delete()
+	project.file('target/app.war').delete()
 }
 
 task wrapper(type: Wrapper) {
@@ -131,11 +124,11 @@ task wrapper(type: Wrapper) {
 
 task buildDocker(type: Docker, dependsOn: [stage]) {
   push = true
-  applicationName = jar.baseName
+  applicationName = war.baseName
   dockerfile = file('src/main/docker/Dockerfile')
   doFirst {
     copy {
-      from jar
+      from war
       into stageDir
     }
   }
