@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @AutoConfigureRestDocs
 @SpringBootTest(classes={BillingPlanApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ServiceOfferingPlanApplicationTests {
+public class BillingPlanApplicationTests {
 
 	@LocalServerPort
 	private int port;
