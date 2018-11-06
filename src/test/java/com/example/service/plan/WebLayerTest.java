@@ -1,5 +1,7 @@
 package com.example.service.plan;
 
+import com.example.service.plan.model.ServiceOffering;
+import com.example.service.plan.model.VideoDefinition;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -23,6 +25,7 @@ import java.nio.file.Paths;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,28 +42,9 @@ public class WebLayerTest {
     @Test
     public void shouldReturnDefaultMessage() throws Exception {
         this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
-                .andExpect(content().string(containsString("Hello World")))
+                .andExpect(content().string(containsString("Welcome to My Example Project.")))
                 .andDo(document("home"));
     }
 
-//    @Test
-//    public void createSpringfoxSwaggerJson() throws Exception {
-//        //String designFirstSwaggerLocation = Swagger2MarkupTest.class.getResource("/swagger.yaml").getPath();
-//
-//        String outputDir = System.getProperty("io.springfox.staticdocs.outputDir");
-//        System.out.println("OUTPUT DUR " + outputDir);
-//        MvcResult mvcResult = this.mockMvc.perform(get("/v2/api-docs")
-//                .accept(MediaType.APPLICATION_JSON))
-////                .andExpect(status().isOk())
-//                .andReturn();
-//
-//        MockHttpServletResponse response = mvcResult.getResponse();
-//        String swaggerJson = response.getContentAsString();
-//        Files.createDirectories(Paths.get(outputDir));
-//        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputDir, "swagger.json"), StandardCharsets.UTF_8)){
-//            writer.write(swaggerJson);
-//        }
-//    }
-//
-//
+
 }

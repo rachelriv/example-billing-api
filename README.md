@@ -1,55 +1,26 @@
-heroku-gradle-spring-boot [![build](https://api.travis-ci.org/daggerok/heroku-gradle-spring-boot.svg?branch=master)](https://travis-ci.org/daggerok/heroku-gradle-spring-boot) 
+netflix-example-project  
 =========================
 
-simple spring cloud config application
+Sample Application for 
 
-## run in docker container
-
-```shell
-docker run -p 8888:8888 daggerok/heroku-gradle-spring-boot
-open http://${DOCKER_IP}:8888
-```
-
-## local run
+## Run Locally
 
 ```shell
 git clone ...
-./gradlew build
-java -jar build/libs/heroku-gradle-spring-boot.jar
+./gradlew clean build
+java -jar build/libs/netflix-example-project.war
 open http://localhost:8888
 ```
 
-## deploy on heroku
+### See Documentation
+Swagger: `http://localhost:8888/swagger-ui.html`
+AsciiDoc: `http://localhost:8888/docs/index.html` 
 
-- create some gradle project
+## Deploy on Heroku
 
-- update build.gradle - add stage task for build, set jar filename:
+1. Install the Heroku CLI
 
-```groovy
-task stage {
-	dependsOn build
-}
-
-jar {
-	baseName = 'heroku-gradle-spring-boot'
-}
-```
-
-- add Procfile with run command:
-
-```shell
-web: java $JAVA_OPTS -Dserver.port=$PORT -jar build/libs/heroku-gradle-spring-boot.jar
-```
-
-- git repository required
-
-```shell
-git init
-```
-
-- install heroku cli
-
-- deploy
+2. Deploy
 
 ```shell
 heroku login
@@ -58,20 +29,4 @@ git push heroku master
 # wait until you see kind of:
 # https://some-words-numbers.herokuapp.com/ deployed to Heroku
 heroku open
-```
-
-redirect on https://some-words-numbers.herokuapp.com/default/master
-
-- list apps
-
-```shell
-heroku apps
-=== My Apps
-some-words-numbers
-```
-
-- remove app
-
-```shell
-heroku apps:destroy --app some-words-numbers
 ```

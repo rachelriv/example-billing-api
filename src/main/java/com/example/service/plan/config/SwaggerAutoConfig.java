@@ -11,7 +11,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
 @Configuration
-public class SwaggerAutoConfiguration {
+public class SwaggerAutoConfig {
 
     @Bean
     public Docket api() {
@@ -30,9 +30,8 @@ public class SwaggerAutoConfiguration {
                         "As we are a global service, we have defined prices for each service plan for the country we support.  " +
                         "For each customer, we know the service plan (1S, 2S, or 4S), the price for the chosen plan and the country of the customer." +
                         "This API hosts Netflix pricing which will enable us to systematically change prices across all our global customers (including changes pushed by country).")
-                .contact(new Contact("Rachel Rivera", "http:/test-url.com", "rachel.nicole.rivera@gmail.com"))
+                .contact(new Contact("Rachel Rivera", "https://github.com/rachelriv", "rachel.nicole.rivera@gmail.com"))
                 .version("1.0.0")
                 .build();
     }
-
 }

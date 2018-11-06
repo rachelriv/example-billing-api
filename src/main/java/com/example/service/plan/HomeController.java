@@ -11,7 +11,7 @@ public class HomeController {
 
     @GetMapping("/")
     public Map<String, Object> greeting() {
-        return Collections.singletonMap("message", "Hello World");
+        return Collections.singletonMap("message", "Welcome to My Example Project.");
     }
 
 }

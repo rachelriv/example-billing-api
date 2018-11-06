@@ -16,5 +16,4 @@ public class BillingPlanApplication {
 		SpringApplication.run(BillingPlanApplication.class, args);
 	}
 
-
 }

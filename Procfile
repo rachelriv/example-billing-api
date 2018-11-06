@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -Dserver.port=$PORT -jar target/app.war
+web: java $JAVA_OPTS -Dserver.port=$PORT -jar target/netflix-example-project.war
