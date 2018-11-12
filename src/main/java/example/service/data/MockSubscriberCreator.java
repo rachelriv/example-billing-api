@@ -27,7 +27,7 @@ public class MockSubscriberCreator {
     private static final Random RANDOM = new Random();
     private static final String LOCALE_LANGUAGE = "EN";
 
-    private static final int MOCK_SUBSCRIBER_COUNT = 1000;
+    private static final int MOCK_SUBSCRIBER_COUNT = 100;
 
     @Autowired SubscriberController subscriberController;
     @Autowired BillingPlanRepository billingPlanRepository;
