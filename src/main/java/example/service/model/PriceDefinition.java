@@ -54,6 +54,14 @@ public class PriceDefinition {
     @ApiModelProperty(required = true, example = "2019-1-01@11:10:09.876-0700")
     private Date expirationDate;
 
+    public void copyProperties(final PriceDefinition other) {
+        this.setActivationDate(other.getActivationDate());
+        this.setExpirationDate(other.getExpirationDate());
+        this.setCurrencyCode(other.getCurrencyCode());
+        this.setCurrencyValue(other.getCurrencyValue());
+        this.setPriceType(other.getPriceType());
+    }
+
     public boolean isOverlapping(final PriceDefinition other) {
         if (this.priceType.equals(PriceType.TRIAL) || other.priceType.equals(PriceType.TRIAL)) {
             return false;

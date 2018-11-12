@@ -25,7 +25,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
@@ -108,9 +116,23 @@ public class BillingPlanController {
         return priceDefinitionRepository.findByBillingPlan_Id(id);
     }
 
+    @GetMapping(value = "/{id}/price-definitions/{priceId}")
+    @ApiOperation(value = "Get a specific price definition for this billing plan.", response = PriceDefinition.class)
+    public PriceDefinition patchPriceDefinition(@PathVariable Integer id, @PathVariable Integer priceId) {
+        Optional<BillingPlan> billingPlan = billingPlanRepository.findById(id);
+        if (!billingPlan.isPresent()) {
+            throw new BillingPlanCreationException(String.format("No billing plan found with id=%d", id), ErrorCode.VALIDATION_ERROR);
+        }
+        Optional<PriceDefinition> optionalExistingPrice = priceDefinitionRepository.findById(priceId);
+        if (!optionalExistingPrice.isPresent()) {
+            throw new BillingPlanCreationException(String.format("No price definition found with id=%d", priceId), ErrorCode.VALIDATION_ERROR);
+        }
+        return optionalExistingPrice.get();
+    }
+
     @PutMapping(value = "/{id}/price-definitions/{priceId}")
-    @ApiOperation(value = "Create a new price definition for this billing plan.", response = PriceDefinition.class)
-    public PriceDefinition patchPriceDefinition(@PathVariable Integer id, @PathVariable Integer priceId, @Valid @RequestBody PriceDefinition priceDefinition) {
+    @ApiOperation(value = "Update an existing price definition for this billing plan.", response = PriceDefinition.class)
+    public PriceDefinition patchPriceDefinition(@PathVariable Integer id, @PathVariable Integer priceId, @Valid @RequestBody PriceDefinition updatedPriceDefinition) {
         Optional<BillingPlan> billingPlan = billingPlanRepository.findById(id);
         if (!billingPlan.isPresent()) {
             throw new BillingPlanCreationException(String.format("No billing plan found with id=%d", id), ErrorCode.VALIDATION_ERROR);
@@ -120,11 +142,7 @@ public class BillingPlanController {
             throw new BillingPlanCreationException(String.format("No price definition found with id=%d", priceId), ErrorCode.VALIDATION_ERROR);
         }
         PriceDefinition existingPrice = optionalExistingPrice.get();
-        existingPrice.setActivationDate(priceDefinition.getActivationDate());
-        existingPrice.setExpirationDate(priceDefinition.getExpirationDate());
-        existingPrice.setCurrencyCode(priceDefinition.getCurrencyCode());
-        existingPrice.setCurrencyValue(priceDefinition.getCurrencyValue());
-        existingPrice.setPriceType(priceDefinition.getPriceType());
+        existingPrice.copyProperties(updatedPriceDefinition);
         return priceDefinitionRepository.save(existingPrice);
     }
 
