@@ -1,6 +1,9 @@
 = Getting Started With Spring REST Docs
 
-This is an example output for a service running at http://localhost:8080:
+This is an example output for a service running at https://example-billing-api.herokuapp.com:
+
+== Authentication and authorization
+Though outside the scope of this assignment, this REST API would ideally use the OAuth 2.0 protocol to authorize calls.
 
 include::{generated}/overview.adoc[]
 include::{generated}/paths.adoc[]

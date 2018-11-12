@@ -30,3 +30,9 @@ git push heroku master
 # https://some-words-numbers.herokuapp.com/ deployed to Heroku
 heroku open
 ```
+
+## Deployed Instance
+http://example-billing-api.herokuapp.com/
+
+Swagger Docs: `http://example-billing-api.herokuapp.com/swagger-ui.html`
+AsciiDoc: `https://example-billing-api.herokuapp.com/docs/index.html`

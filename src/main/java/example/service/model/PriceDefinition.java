@@ -19,7 +19,7 @@ public class PriceDefinition {
     @GeneratedValue
     @ApiModelProperty(hidden = true)
     @Column(name = "price_definition_id")
-    private Long priceDefinitionId;
+    private Integer priceDefinitionId;
 
     @ManyToOne
     @JoinColumn(name="billing_plan_id", nullable = false)

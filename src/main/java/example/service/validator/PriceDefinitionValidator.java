@@ -27,7 +27,6 @@ public class PriceDefinitionValidator implements Validator {
     @Override
     public void validate(@Nullable Object o, Errors errors) {
         PriceDefinition priceDefinition = (PriceDefinition) o;
-        LOGGER.error("VALIDATING PRICE DEFINITION " + priceDefinition);
         if (priceDefinition.getExpirationDate().before(priceDefinition.getActivationDate())) {
             String errorMsg = String.format("PriceDefinition=%s activation date should be before the expiration date.", priceDefinition);
             errors.rejectValue("activationDate", "priceDefinitions.activationDate", errorMsg);
