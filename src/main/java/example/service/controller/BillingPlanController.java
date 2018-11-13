@@ -106,15 +106,15 @@ public class BillingPlanController {
         return priceDefinitionRepository.findByBillingPlan_Id(billingPlanId);
     }
 
-    @PostMapping(value = "/{id}/price-definitions")
+    @PostMapping(value = "/{billingPlanId}/price-definitions")
     @ApiOperation(value = "Create a new price definition for this billing plan.", response = PriceDefinition[].class)
-    public List<PriceDefinition> addPriceDefinition(@PathVariable Integer id, @Valid @RequestBody PriceDefinition priceDefinition) {
-        Optional<BillingPlan> billingPlan = billingPlanRepository.findById(id);
+    public List<PriceDefinition> addPriceDefinition(@PathVariable Integer billingPlanId, @Valid @RequestBody PriceDefinition priceDefinition) {
+        Optional<BillingPlan> billingPlan = billingPlanRepository.findById(billingPlanId);
         if (!billingPlan.isPresent()) {
-            throw new BillingPlanCreationException(String.format("No billing plan found with id=%d", id), ErrorCode.VALIDATION_ERROR);
+            throw new BillingPlanCreationException(String.format("No billing plan found with id=%d", billingPlanId), ErrorCode.VALIDATION_ERROR);
         }
         verifyAndSavePriceDefinitions(billingPlan.get(), Collections.singleton(priceDefinition));
-        return priceDefinitionRepository.findByBillingPlan_Id(id);
+        return priceDefinitionRepository.findByBillingPlan_Id(billingPlanId);
     }
 
     @GetMapping(value = "/{billingPlanId}/price-definitions/{priceId}")
@@ -133,20 +133,20 @@ public class BillingPlanController {
 
     @PutMapping(value = "/{billingPlanId}/price-definitions/{priceId}")
     @ApiOperation(value = "Update an existing price definition for this billing plan.", response = PriceDefinition.class)
-    public PriceDefinition patchPriceDefinition(@PathVariable Integer billingPlanId, @PathVariable Integer priceDefinitionId, @Valid @RequestBody PriceDefinition updatedPriceDefinition) {
+    public PriceDefinition patchPriceDefinition(@PathVariable Integer billingPlanId, @PathVariable Integer priceId, @Valid @RequestBody PriceDefinition updatedPriceDefinition) {
         Optional<BillingPlan> optionalBillingPlan = billingPlanRepository.findById(billingPlanId);
         if (!optionalBillingPlan.isPresent()) {
             throw new BillingPlanCreationException(String.format("No billing plan found with billingPlanId=%d", billingPlanId), ErrorCode.VALIDATION_ERROR);
         }
         BillingPlan billingPlan = optionalBillingPlan.get();
-        Optional<PriceDefinition> optionalExistingPrice = billingPlan.getPriceDefinitions().stream().filter(p -> priceDefinitionId.equals(p.getPriceDefinitionId())).findFirst();
+        Optional<PriceDefinition> optionalExistingPrice = billingPlan.getPriceDefinitions().stream().filter(p -> priceId.equals(p.getPriceDefinitionId())).findFirst();
         if (!optionalExistingPrice.isPresent()) {
-            throw new BillingPlanCreationException(String.format("No price definition found with priceDefinitionId=%d", priceDefinitionId), ErrorCode.VALIDATION_ERROR);
+            throw new BillingPlanCreationException(String.format("No price definition found with priceId=%d", priceId), ErrorCode.VALIDATION_ERROR);
         }
         PriceDefinition existingPrice = optionalExistingPrice.get();
         existingPrice.copyProperties(updatedPriceDefinition);
         priceDefinitionRepository.save(existingPrice);
-        return priceDefinitionRepository.findById(priceDefinitionId).get();
+        return priceDefinitionRepository.findById(priceId).get();
     }
 
     private void verifyPricePeriodsDoNotOverlap(final Integer billingPlanId, final Collection<PriceDefinition> priceDefinitions) {
