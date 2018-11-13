@@ -32,6 +32,7 @@ public class MockSubscriberCreator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MockBillingPlanLoader.class);
     private static final String LOCALE_LANGUAGE = "EN";
     private static final int MOCK_SUBSCRIBER_COUNT_PER_COUNTRY = 10;
+    private static final int MAX_COUNTRY_COUNT_TO_POPULATE_WITH_SUBSCRIBERS = 10;
     private static final Random RANDOM = new Random();
 
     // TODO: Don't construct as many mock subscribers/subscriptions for tests
@@ -45,7 +46,7 @@ public class MockSubscriberCreator {
 
     @PostConstruct
     public void createSubscribers() {
-        Map<CountryCode, List<BillingPlan>> billingPlansByCountry = fetchBillingPlansByCountry();
+        Map<CountryCode, List<BillingPlan>> billingPlansByCountry = fetchSubsetOfBillingPlansByCountry();
         Map<CountryCode, List<Subscriber>> subscribersByCountry = new HashMap<>();
         billingPlansByCountry.forEach(((countryCode, billingPlans) -> {
             LOGGER.info("Constructing {} mock subscribers in country={}.", MOCK_SUBSCRIBER_COUNT_PER_COUNTRY, countryCode);
@@ -90,9 +91,10 @@ public class MockSubscriberCreator {
         return subscriber;
     }
 
-    private Map<CountryCode, List<BillingPlan>> fetchBillingPlansByCountry() {
+    private Map<CountryCode, List<BillingPlan>> fetchSubsetOfBillingPlansByCountry() {
         return Lists.newArrayList(billingPlanRepository.findAll())
                 .stream()
+                .limit(MAX_COUNTRY_COUNT_TO_POPULATE_WITH_SUBSCRIBERS)
                 .collect(Collectors.groupingBy(BillingPlan::getCountryCode));
     }
 
