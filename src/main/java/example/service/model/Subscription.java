@@ -12,8 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import lombok.Data;
 import lombok.NonNull;
 import org.hibernate.annotations.GenericGenerator;
@@ -41,12 +39,12 @@ public class Subscription {
     private BillingPlan billingPlan;
 
     @NonNull
-    @Temporal(TemporalType.DATE)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
     @ApiModelProperty(required = true, example = "2019-1-01@11:10:09.876-0700")
-    private Date startDate;
+    private Date billingCycleAnchor;
 
-    // canceled_at
-    // billing_cycle_anchor
-    // charge mechanism?
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
+    @ApiModelProperty(required = false, example = "2019-1-01@11:10:09.876-0700")
+    private Date canceledAt;
+
 }

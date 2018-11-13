@@ -7,10 +7,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 
 @SpringBootApplication
 @EnableSwagger2WebMvc
-public class NetflixExampleApplication {
+public class ExampleBillingPlanApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(NetflixExampleApplication.class, args);
+		SpringApplication.run(ExampleBillingPlanApplication.class, args);
 	}
 
 }

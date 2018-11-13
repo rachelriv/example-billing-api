@@ -13,8 +13,10 @@ import example.service.model.ServiceOffering;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +62,7 @@ public class MockBillingPlanLoader {
     public void loadBillingPlans() {
         try {
             List<SerializedBillingPlan> serializedBillingPlans = loadSerializedBillingPlans();
-            LOGGER.info("Loading example billing plans.", serializedBillingPlans.size());
+            LOGGER.info("Loading example billing plans from {}.", billingPlanCSV);
             serializedBillingPlans.forEach(
                     serializedBillingPlan -> Arrays.stream(serializedBillingPlan.getCountries().split(","))
                             .forEach(country -> saveBillingPlansForCountry(country, serializedBillingPlan))
@@ -72,16 +74,9 @@ public class MockBillingPlanLoader {
     }
 
     private BillingPlan constructNewBillingPlan(final String country, final SerializedBillingPlan serializedBillingPlan, final ServiceOffering serviceOffering) {
-        String priceValue;
-        if (serviceOffering.equals(ServiceOffering.BASIC)) {
-            priceValue = serializedBillingPlan.getBasicPrice();
-        } else if (serviceOffering.equals(ServiceOffering.STANDARD)) {
-            priceValue = serializedBillingPlan.getStandardPrice();
-        } else {
-            priceValue = serializedBillingPlan.getPremiumPrice();
-        }
-        PriceDefinition regularPriceDefinition = new PriceDefinition(PriceType.REGULAR, serializedBillingPlan.getCurrency(), priceValue, new Date(), new Date(System.currentTimeMillis()+100000000L));
-        PriceDefinition trialPriceDefinition = new PriceDefinition(PriceType.TRIAL, serializedBillingPlan.getCurrency(), "0.00", new Date(), new Date(System.currentTimeMillis()+100000000L));
+        String priceValue = getPriceValueForServiceOffering(serializedBillingPlan, serviceOffering);
+        PriceDefinition regularPriceDefinition = new PriceDefinition(PriceType.REGULAR, serializedBillingPlan.getCurrency(), priceValue, new Date(), createRandomFutureDate());
+        PriceDefinition trialPriceDefinition = new PriceDefinition(PriceType.TRIAL, serializedBillingPlan.getCurrency(), "0.00", new Date(), createRandomFutureDate());
         return new BillingPlan(serviceOffering, CountryCode.valueOf(country), Arrays.asList(regularPriceDefinition, trialPriceDefinition));
     }
 
@@ -89,6 +84,23 @@ public class MockBillingPlanLoader {
         billingPlanController.createNewBillingPlan(constructNewBillingPlan(country, serializedBillingPlan, ServiceOffering.BASIC));
         billingPlanController.createNewBillingPlan(constructNewBillingPlan(country, serializedBillingPlan, ServiceOffering.STANDARD));
         billingPlanController.createNewBillingPlan(constructNewBillingPlan(country, serializedBillingPlan, ServiceOffering.PREMIUM));
+    }
+
+    private String getPriceValueForServiceOffering(SerializedBillingPlan serializedBillingPlan, ServiceOffering serviceOffering) {
+        if (serviceOffering.equals(ServiceOffering.BASIC)) {
+            return serializedBillingPlan.getBasicPrice();
+        } else if (serviceOffering.equals(ServiceOffering.STANDARD)) {
+            return serializedBillingPlan.getStandardPrice();
+        } else {
+            return serializedBillingPlan.getPremiumPrice();
+        }
+    }
+
+    private Date createRandomFutureDate() {
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+        c.add(Calendar.DATE, new Random().nextInt(365));
+        return c.getTime();
     }
 
 }

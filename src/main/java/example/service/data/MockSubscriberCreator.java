@@ -1,17 +1,23 @@
 package example.service.data;
 
 import com.github.javafaker.Faker;
-import example.service.controller.SubscriberController;
+import com.github.javafaker.Name;
+import com.google.common.collect.Lists;
+import example.service.model.BillingPlan;
 import example.service.model.CountryCode;
-import example.service.model.ServiceOffering;
 import example.service.model.Subscriber;
+import example.service.model.Subscription;
 import example.service.repository.BillingPlanRepository;
+import example.service.repository.SubscriberRepository;
+import example.service.repository.SubscriptionRepository;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
-import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,38 +30,70 @@ import org.springframework.stereotype.Component;
 public class MockSubscriberCreator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MockBillingPlanLoader.class);
-    private static final Random RANDOM = new Random();
     private static final String LOCALE_LANGUAGE = "EN";
+    private static final int MOCK_SUBSCRIBER_COUNT_PER_COUNTRY = 10;
+    private static final Random RANDOM = new Random();
 
-    private static final int MOCK_SUBSCRIBER_COUNT = 100;
+    // TODO: Don't construct as many mock subscribers/subscriptions for tests
 
-    @Autowired SubscriberController subscriberController;
-    @Autowired BillingPlanRepository billingPlanRepository;
-
-    private static CountryCode randomCountryCode(List<CountryCode> countryCodes)  {
-        return countryCodes.get((RANDOM.nextInt(countryCodes.size())));
-    }
-
-    private static ServiceOffering randomServiceOffering()  {
-        return ServiceOffering.values()[(RANDOM.nextInt(ServiceOffering.values().length))];
-    }
+    @Autowired
+    private BillingPlanRepository billingPlanRepository;
+    @Autowired
+    private SubscriberRepository subscriberRepository;
+    @Autowired
+    private SubscriptionRepository subscriptionRepository;
 
     @PostConstruct
     public void createSubscribers() {
-        Set<CountryCode> countryCodesWithBillingPlans = new HashSet<>();
-        billingPlanRepository.findAll().forEach(plan -> countryCodesWithBillingPlans.add(plan.getCountryCode()));
-        List<CountryCode> countryCodesWithBillingPlansList = new ArrayList<>(countryCodesWithBillingPlans);
+        Map<CountryCode, List<BillingPlan>> billingPlansByCountry = fetchBillingPlansByCountry();
+        Map<CountryCode, List<Subscriber>> subscribersByCountry = new HashMap<>();
+        billingPlansByCountry.forEach(((countryCode, billingPlans) -> {
+            LOGGER.info("Constructing {} mock subscribers in country={}.", MOCK_SUBSCRIBER_COUNT_PER_COUNTRY, countryCode);
+            Faker faker = constructFaker(new Locale(LOCALE_LANGUAGE, countryCode.name()));
+            List<Subscriber> subscribers = new ArrayList<>();
+            for (int i = 0; i < MOCK_SUBSCRIBER_COUNT_PER_COUNTRY; i++) {
+                subscribers.add(createNewSubscriber(faker, countryCode));
+            }
+            subscribersByCountry.put(countryCode, subscribers);
+        }));
+        Iterable<Subscriber> savedSubscribers= subscriberRepository
+                .saveAll(subscribersByCountry.values().stream().flatMap(List::stream).collect(Collectors.toList()));
+        subscriptionRepository.saveAll(createSubscriptionsForSubscribers(Lists.newArrayList(savedSubscribers), billingPlansByCountry));
+    }
 
-        LOGGER.info("Constructing {} mock subscribers.", MOCK_SUBSCRIBER_COUNT);
+    private List<Subscription> createSubscriptionsForSubscribers(final List<Subscriber> subscribers,
+                                                                 final Map<CountryCode, List<BillingPlan>> billingPlansByCountry) {
+        return subscribers
+                .stream()
+                .map(subscriber ->
+                        new Subscription(
+                                subscriber,
+                                selectRandomBillingPlan(billingPlansByCountry.get(subscriber.getCountryCode())),
+                                new Date()))
+                .collect(Collectors.toList());
+    }
 
-        for (int i = 0; i < MOCK_SUBSCRIBER_COUNT; i++) {
-            // TODO: bulk load
-            CountryCode countryCode = randomCountryCode(countryCodesWithBillingPlansList);
-            Locale locale = new Locale(LOCALE_LANGUAGE, countryCode.name());
-            Subscriber subscriber = new Subscriber(countryCode);
-            subscriber.setName(constructFaker(locale).name().fullName());
-            subscriberController.createNewSubscriber(randomServiceOffering(), subscriber);
-        }
+    private BillingPlan selectRandomBillingPlan(final List<BillingPlan> billingPlans) {
+        return billingPlans.get(RANDOM.nextInt(billingPlans.size()));
+    }
+
+    private Subscriber createNewSubscriber(final Faker faker, final CountryCode countryCode) {
+        Name name = faker.name();
+        String firstName = name.firstName();
+        String lastName = name.lastName();
+
+        String email = String.format("%s%s@example.com", firstName.toLowerCase(), lastName.toLowerCase());
+        Subscriber subscriber = new Subscriber(email, countryCode);
+        subscriber.setFirstName(firstName);
+        subscriber.setLastName(lastName);
+
+        return subscriber;
+    }
+
+    private Map<CountryCode, List<BillingPlan>> fetchBillingPlansByCountry() {
+        return Lists.newArrayList(billingPlanRepository.findAll())
+                .stream()
+                .collect(Collectors.groupingBy(BillingPlan::getCountryCode));
     }
 
     private Faker constructFaker(final Locale locale) {

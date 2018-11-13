@@ -1,6 +1,7 @@
 package example.service.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,6 +16,7 @@ import lombok.NonNull;
 
 @Data
 @Entity
+@ApiModel
 public class Subscriber {
     @Id
     @GeneratedValue
@@ -22,8 +24,15 @@ public class Subscriber {
     @Column(name = "subscriber_id")
     private Integer id;
 
-    @ApiModelProperty(example = "John Doe")
-    private String name;
+    @ApiModelProperty(example = "John")
+    private String firstName;
+
+    @ApiModelProperty(example = "Smith")
+    private String lastName;
+
+    @NonNull
+    @ApiModelProperty(example = "johnsmith@email.com", required = true)
+    private String email;
 
     @NonNull
     @ApiModelProperty(notes = "two-character IS0-3166-1 country codes", example = "US", required = true)

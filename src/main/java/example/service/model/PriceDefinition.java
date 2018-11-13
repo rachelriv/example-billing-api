@@ -41,14 +41,12 @@ public class PriceDefinition {
     private String currencyValue;
 
     @NonNull
-    @Temporal(TemporalType.DATE)
     @Column(name = "activation_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
     @ApiModelProperty(required = true, example = "2018-1-01@11:10:09.876-0700")
     private Date activationDate;
 
     @NonNull
-    @Temporal(TemporalType.DATE)
     @Column(name = "expiration_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
     @ApiModelProperty(required = true, example = "2019-1-01@11:10:09.876-0700")
@@ -63,11 +61,11 @@ public class PriceDefinition {
     }
 
     public boolean isOverlapping(final PriceDefinition other) {
-        if (this.priceType.equals(PriceType.TRIAL) || other.priceType.equals(PriceType.TRIAL)) {
+        if (!this.priceType.equals(other.priceType)) {
             return false;
         }
         Interval thisActivePeriod = new Interval(activationDate.getTime(), expirationDate.getTime());
-        Interval otherActivePeriod = new Interval( this.getActivationDate().getTime(), other.getExpirationDate().getTime());
+        Interval otherActivePeriod = new Interval(other.getActivationDate().getTime(), other.getExpirationDate().getTime());
         return thisActivePeriod.overlaps(otherActivePeriod);
     }
 }
