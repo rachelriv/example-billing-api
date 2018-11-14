@@ -1,18 +1,17 @@
 package example.billing.service.api;
 
 import example.billing.service.exception.ApiErrorResponse;
-import example.billing.service.model.CountryCode;
 import example.billing.service.model.Subscription;
 import example.billing.service.repository.SubscriptionRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,18 +21,15 @@ public class SubscriptionController {
 
     @Autowired SubscriptionRepository subscriptionRepository;
 
-    @GetMapping(value = "/")
+    @GetMapping(value = "/{subscriptionId}")
     @ApiOperation(value = "View a list of subscriptions.", response = Iterable.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved list", response = Subscription[].class),
+            @ApiResponse(code = 200, message = "Successfully retrieved subscription.", response = Subscription.class),
             @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
     }
     )
-    public Iterable<Subscription> subscriptions(@RequestParam(value = "country", required = false) final CountryCode country) {
-        if (StringUtils.isEmpty(country)) {
-            return subscriptionRepository.findAll();
-        }
-        return subscriptionRepository.findBySubscriber_CountryCode(country);
+    public Subscription findSubscription(@PathVariable UUID subscriptionId) {
+        return subscriptionRepository.findById(subscriptionId).get();
     }
 
 }

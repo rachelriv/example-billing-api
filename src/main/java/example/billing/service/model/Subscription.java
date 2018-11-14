@@ -1,6 +1,7 @@
 package example.billing.service.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
@@ -11,7 +12,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import lombok.Data;
 import lombok.NonNull;
 import org.hibernate.annotations.GenericGenerator;
@@ -27,9 +27,10 @@ public class Subscription {
     private UUID id;
 
     @NonNull
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "subscriber_id", nullable = false)
-    @ApiModelProperty(readOnly = true)
+    @JsonIgnore
+    @ApiModelProperty(hidden = true)
     private Subscriber subscriber;
 
     @NonNull

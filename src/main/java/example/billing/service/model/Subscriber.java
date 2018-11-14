@@ -1,16 +1,15 @@
 package example.billing.service.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -39,10 +38,8 @@ public class Subscriber {
     @Enumerated(EnumType.STRING)
     private CountryCode countryCode;
 
-    @OneToOne
-    @JoinColumn(name = "subscription_id")
-    @JsonIgnore
-    @ApiModelProperty(hidden = true)
-    private Subscription subscription;
+    @OneToMany(mappedBy = "subscriber")
+    @ApiModelProperty(readOnly = true)
+    private List<Subscription> subscriptions;
 
 }

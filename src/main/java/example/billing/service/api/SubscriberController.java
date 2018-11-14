@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/v1/subscribers")
-@Api(tags = "Subscribers", description = "Use the `/subscribers` resource to create, update, show details for, and list subscribers.")
+@RequestMapping("/v1/customers")
+@Api(tags = "Customers", description = "Use the `/customers` resource to create, update, show details for, and list customers.")
 public class SubscriberController {
 
     @Autowired
@@ -39,7 +39,7 @@ public class SubscriberController {
     private BillingPlanRepository billingPlanRepository;
 
     @GetMapping(value = "/")
-    @ApiOperation(value = "View a list of users.", response = Iterable.class)
+    @ApiOperation(value = "View a list of customers.", response = Iterable.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved list", response = Subscriber[].class),
             @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
@@ -53,7 +53,7 @@ public class SubscriberController {
     }
 
     @PostMapping(value = "/")
-    @ApiOperation(value = "Create a new user.", response = Subscriber.class)
+    @ApiOperation(value = "Create a new customer.", response = Subscriber.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully created a new subscriber.", response = Subscriber.class),
             @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
