@@ -30,12 +30,8 @@ import org.springframework.stereotype.Component;
 public class MockSubscriberCreator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MockBillingPlanLoader.class);
-    private static final String LOCALE_LANGUAGE = "EN";
     private static final int MOCK_SUBSCRIBER_COUNT_PER_COUNTRY = 10;
-    private static final int MAX_COUNTRY_COUNT_TO_POPULATE_WITH_SUBSCRIBERS = 10;
     private static final Random RANDOM = new Random();
-
-    // TODO: Don't construct as many mock subscribers/subscriptions for tests
 
     @Autowired
     private BillingPlanRepository billingPlanRepository;
@@ -48,9 +44,9 @@ public class MockSubscriberCreator {
     public void createSubscribers() {
         Map<CountryCode, List<BillingPlan>> billingPlansByCountry = fetchSubsetOfBillingPlansByCountry();
         Map<CountryCode, List<Subscriber>> subscribersByCountry = new HashMap<>();
+        Faker faker = new Faker(Locale.ENGLISH);
         billingPlansByCountry.forEach(((countryCode, billingPlans) -> {
             LOGGER.info("Constructing {} mock subscribers in country={}.", MOCK_SUBSCRIBER_COUNT_PER_COUNTRY, countryCode);
-            Faker faker = constructFaker(new Locale(LOCALE_LANGUAGE, countryCode.name()));
             List<Subscriber> subscribers = new ArrayList<>();
             for (int i = 0; i < MOCK_SUBSCRIBER_COUNT_PER_COUNTRY; i++) {
                 subscribers.add(createNewSubscriber(faker, countryCode));
@@ -94,15 +90,7 @@ public class MockSubscriberCreator {
     private Map<CountryCode, List<BillingPlan>> fetchSubsetOfBillingPlansByCountry() {
         return Lists.newArrayList(billingPlanRepository.findAll())
                 .stream()
-                .limit(MAX_COUNTRY_COUNT_TO_POPULATE_WITH_SUBSCRIBERS)
                 .collect(Collectors.groupingBy(BillingPlan::getCountryCode));
     }
 
-    private Faker constructFaker(final Locale locale) {
-        try {
-            return new Faker(locale);
-        } catch (Exception e) {
-            return new Faker(Locale.ENGLISH);
-        }
-    }
 }
