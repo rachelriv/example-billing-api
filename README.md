@@ -1,7 +1,5 @@
-netflix-example-project  
+Example Billing API  
 =========================
-
-Sample Application for 
 
 ## Run Locally
 

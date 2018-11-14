@@ -1,10 +1,10 @@
-= Getting Started With Spring REST Docs
-
-This is an example output for a service running at https://example-billing-api.herokuapp.com:
+= Example Billing API
 
 include::{generated}/overview.adoc[]
+
 == Authentication and authorization
 Though outside the scope of this assignment, this REST API would ideally use the OAuth 2.0 protocol to authorize calls.
+
 include::{generated}/paths.adoc[]
 include::{generated}/security.adoc[]
 include::{generated}/definitions.adoc[]
