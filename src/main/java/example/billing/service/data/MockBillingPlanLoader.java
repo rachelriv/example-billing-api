@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.google.common.base.Strings;
 import example.billing.service.api.BillingPlanController;
 import example.billing.service.model.BillingPlan;
 import example.billing.service.model.CountryCode;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 public class MockBillingPlanLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MockBillingPlanLoader.class);
+    private static final int DAYS_PER_YEAR = 365;
 
     @Value("${setup.data.billing-plans}")
     String billingPlanCSV;
@@ -76,7 +78,7 @@ public class MockBillingPlanLoader {
     private BillingPlan constructNewBillingPlan(final String country, final SerializedBillingPlan serializedBillingPlan, final ServiceOffering serviceOffering) {
         String priceValue = getPriceValueForServiceOffering(serializedBillingPlan, serviceOffering);
         PriceDefinition regularPriceDefinition = new PriceDefinition(PriceType.REGULAR, serializedBillingPlan.getCurrency(), priceValue, new Date(), createRandomFutureDate());
-        PriceDefinition trialPriceDefinition = new PriceDefinition(PriceType.TRIAL, serializedBillingPlan.getCurrency(), "0.00", new Date(), createRandomFutureDate());
+        PriceDefinition trialPriceDefinition = new PriceDefinition(PriceType.TRIAL, serializedBillingPlan.getCurrency(), constructTrialPrice(priceValue), new Date(), createRandomFutureDate());
         return new BillingPlan(serviceOffering, CountryCode.valueOf(country), Arrays.asList(regularPriceDefinition, trialPriceDefinition));
     }
 
@@ -96,10 +98,19 @@ public class MockBillingPlanLoader {
         }
     }
 
+    private String constructTrialPrice(final String regularPriceValue) {
+        String trialPrice = "0";
+        int indexOfDecimalPoint = regularPriceValue.indexOf(".");
+        if (indexOfDecimalPoint > 0) {
+            trialPrice += "." + Strings.repeat("0", regularPriceValue.length() - 1 - indexOfDecimalPoint);
+        }
+        return trialPrice;
+    }
+
     private Date createRandomFutureDate() {
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
-        c.add(Calendar.DATE, new Random().nextInt(365));
+        c.add(Calendar.DATE, new Random().nextInt(DAYS_PER_YEAR));
         return c.getTime();
     }
 

@@ -166,7 +166,7 @@ public class BillingPlanController {
     }
 
     private PriceDefinition findPriceDefinition(final BillingPlan billingPlan, final Integer priceId) {
-        Optional<PriceDefinition> optionalExistingPrice = billingPlan.getPriceDefinitions()
+        Optional<PriceDefinition> optionalExistingPrice = priceDefinitionRepository.findByBillingPlan_Id(billingPlan.getId())
                 .stream()
                 .filter(p -> priceId.equals(p.getPriceDefinitionId()))
                 .findFirst();
